@@ -1,0 +1,19 @@
+Full Stack Developer (Entry Level)
+Brightpath Software, Hyderabad (hybrid)
+
+About the role
+We are hiring a full stack developer to build customer-facing web applications with our product team.
+
+What you will do
+- Build responsive user interfaces with React and TypeScript
+- Design and build REST APIs with Node.js and Express
+- Work with PostgreSQL and MongoDB databases
+- Write unit tests and take part in code reviews
+- Ship features in two-week sprints using Git and CI pipelines
+
+What we are looking for
+- Degree in computer science or a related field, or equivalent projects
+- Strong JavaScript or TypeScript skills
+- Experience with React and a backend framework
+- Understanding of HTTP, authentication and API design
+- Nice to have: Docker basics and experience deploying a web app

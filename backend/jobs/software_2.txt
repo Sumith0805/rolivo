@@ -1,0 +1,18 @@
+Backend Engineer (Java)
+Corevale Systems, Bengaluru
+
+About the role
+Join the platform team that runs the services behind our payments product. You will design, build and maintain backend services used by millions of customers.
+
+Responsibilities
+- Build and maintain microservices in Java and Spring Boot
+- Design clean, versioned REST API contracts for mobile and web clients
+- Model data in relational databases and write efficient queries
+- Add logging, metrics and automated tests to every service
+- Review code and mentor junior engineers
+
+Requirements
+- 1 to 3 years of backend software engineering experience
+- Solid Java, object-oriented design and data structures
+- Experience with microservices and message queues such as Kafka
+- Familiarity with Docker

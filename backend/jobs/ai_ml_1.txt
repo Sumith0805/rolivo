@@ -1,0 +1,19 @@
+Machine Learning Engineer Intern
+Vistara AI, Hyderabad
+
+About the internship
+You will work with our research team to train, evaluate and ship machine learning models for document understanding.
+
+What you will do
+- Train and tune deep learning models in PyTorch
+- Build NLP pipelines for text classification and entity extraction
+- Run experiments, track metrics and write up results
+- Prepare datasets and improve data quality
+- Help deploy models behind internal APIs
+
+What we are looking for
+- Final-year student in computer science, AI or a related field
+- Strong Python and good knowledge of machine learning fundamentals
+- Experience with PyTorch or TensorFlow and scikit-learn
+- Understanding of model evaluation: precision, recall, F1
+- Nice to have: Hugging Face, experience with neural network architectures

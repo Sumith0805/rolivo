@@ -1,0 +1,19 @@
+SOC Analyst (Tier 1)
+Sentinel Secure, Gurugram (shift based)
+
+About the role
+You will be part of our security operations center, watching over customer networks around the clock.
+
+What you will do
+- Monitor alerts in the SIEM and triage possible incidents
+- Investigate suspicious activity and escalate real threats
+- Review firewall and intrusion detection logs
+- Run vulnerability scans and report findings
+- Write clear incident reports and follow response playbooks
+
+Requirements
+- Degree in computer science, cybersecurity or related field
+- Understanding of networking, TCP/IP and network security basics
+- Familiarity with common attacks and defensive tools
+- Certifications such as CCNA or Security+ are a plus
+- Calm, careful and good at writing

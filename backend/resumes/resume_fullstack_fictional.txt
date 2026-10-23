@@ -1,0 +1,28 @@
+Rohit Menon
+Full Stack Developer | Kochi, India
+rohit.menon@example.com | +91 90000 00001 | github.com/rohitmenon-demo
+
+SUMMARY
+Computer science graduate who builds web applications with React and Node.js and is looking for an entry-level full stack role.
+
+SKILLS
+Languages: JavaScript, TypeScript, Java, SQL
+Web: React, Node.js, Express, REST APIs, HTML, CSS
+Databases: MongoDB, MySQL
+Tools: Git, GitHub, Postman
+
+EXPERIENCE
+Web Development Intern, Example Web Studio, Jun 2025 - Aug 2025
+- Built reusable React components for a client dashboard.
+- Wrote Express endpoints and connected them to MongoDB.
+
+PROJECTS
+Task Board | React, Node.js, MongoDB
+- Built a Kanban task board with sign-in, drag and drop and real-time updates.
+- Designed the REST API and the database schema.
+
+Recipe Finder | JavaScript, REST API
+- Built a search app that calls a public recipe API and saves favourites.
+
+EDUCATION
+B.Tech in Computer Science and Engineering, Example College of Engineering, 2021 - 2025

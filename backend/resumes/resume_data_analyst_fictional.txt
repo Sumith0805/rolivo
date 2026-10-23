@@ -1,0 +1,26 @@
+Meera Iyer
+Data Analyst | Chennai, India
+meera.iyer@example.com | +91 90000 00002 | linkedin.com/in/meeraiyer-demo
+
+SUMMARY
+Statistics graduate who turns data into dashboards and clear recommendations, looking for a data analyst role.
+
+SKILLS
+Analysis: SQL, Excel, pivot tables, descriptive statistics
+Visualization: Power BI, Tableau, data visualization
+Programming: Python (pandas, matplotlib)
+Tools: Git, Google Sheets
+
+EXPERIENCE
+Business Analytics Intern, Example Retail Co., Jan 2025 - Jun 2025
+- Wrote SQL queries to prepare weekly sales reports.
+- Built a Power BI dashboard that tracked stock levels across 12 stores.
+- Presented findings to the store operations team.
+
+PROJECTS
+Customer Churn Analysis | SQL, Python, Power BI
+- Analysed customer records to find the factors linked to churn.
+- Built a dashboard that shows churn by region and product.
+
+EDUCATION
+B.Sc. in Statistics, Example University, 2022 - 2025

@@ -1,0 +1,27 @@
+Asha Verma
+Machine Learning Intern | Hyderabad, India
+asha.verma@example.com | +91 90000 00000 | github.com/ashaverma-demo
+
+SUMMARY
+Final-year AI and Data Science student who builds machine learning projects in Python and is looking for an entry-level machine learning role.
+
+SKILLS
+Languages: Python, SQL, JavaScript
+Machine Learning: scikit-learn, pandas, NumPy, random forest, model evaluation (precision, recall, F1)
+Tools: Git, Flask, Docker basics
+
+EXPERIENCE
+Data Intern, Example Analytics, Jan 2025 - Mar 2025
+- Cleaned and analysed sales data with pandas.
+- Built a weekly dashboard used by the planning team.
+
+PROJECTS
+Insurance Claim Fraud Detection | Python, scikit-learn, Flask
+- Trained a random forest classifier to flag unusual insurance claims.
+- Handled class imbalance and evaluated the model with precision, recall and F1.
+
+Movie Recommender | Python, pandas
+- Built a content-based recommender using TF-IDF and cosine similarity.
+
+EDUCATION
+B.Tech in Artificial Intelligence and Data Science, Example Institute of Technology, 2022 - 2026

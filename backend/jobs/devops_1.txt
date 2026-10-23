@@ -1,0 +1,18 @@
+DevOps Engineer
+Skylane Cloud, Hyderabad
+
+About the role
+You will build and run the infrastructure that our engineering teams deploy to every day.
+
+What you will do
+- Create and maintain CI/CD pipelines for dozens of services
+- Manage Kubernetes clusters and Docker images
+- Write infrastructure as code with Terraform
+- Run workloads on AWS and keep costs under control
+- Set up monitoring, alerting and on-call practices
+
+Requirements
+- Experience with Linux, networking and scripting in Python or Bash
+- Hands-on work with containers and Kubernetes
+- Knowledge of AWS or another major cloud provider
+- A reliability mindset: you automate what you do twice

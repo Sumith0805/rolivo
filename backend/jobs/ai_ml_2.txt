@@ -1,0 +1,20 @@
+Northwind Labs
+Pune, India | Full time
+
+About us
+Northwind Labs builds language-model products for customer support teams. We are a team of 40 and we ship weekly.
+
+Why this role exists
+Our customers want answers grounded in their own documents. We are growing the group that makes that possible.
+
+The job: Applied AI Engineer
+- Design retrieval-augmented generation pipelines with an LLM and a vector database
+- Write and test prompts, and measure answer quality with an evaluation set
+- Fine-tune and evaluate NLP models for classification and summarization
+- Work with generative AI APIs and keep latency and cost under control
+- Work closely with product managers to turn customer problems into features
+
+You bring
+- Strong Python and API skills
+- Hands-on projects with LLMs, embeddings or machine learning
+- A habit of measuring results rather than guessing

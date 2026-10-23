@@ -1,0 +1,19 @@
+Embedded Firmware Engineer
+Kestrel Devices, Chennai
+
+About the role
+We design battery-powered IoT sensors. You will write the firmware that runs on them and help bring each new board to life.
+
+What you will do
+- Write and debug embedded C for ARM Cortex-M microcontrollers
+- Implement drivers for sensors over I2C, SPI and UART
+- Develop firmware on an RTOS such as FreeRTOS
+- Reduce power consumption and memory use
+- Test boards with oscilloscopes and logic analyzers
+
+Requirements
+- Degree in electronics, electrical or computer engineering
+- Strong C programming skills
+- Experience with microcontrollers such as STM32 or ESP32
+- Knowledge of communication protocols and hardware debugging
+- Nice to have: Wi-Fi or Bluetooth connectivity experience
