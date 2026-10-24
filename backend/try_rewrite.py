@@ -3,15 +3,21 @@ import sys
 
 import httpx
 
-BASE = "http://127.0.0.1:8001"
+BASE = os.getenv("API_BASE", "http://127.0.0.1:8001")
 EMAIL = "test@example.com"
-PASSWORD = "testpass123"
+PASSWORD = "TestPass12345"
 
 job_path = sys.argv[1] if len(sys.argv) > 1 else "job.txt"
 facts = open("facts.txt", encoding="utf-8").read() if os.path.exists("facts.txt") else ""
 resume_name = "resume_ml.pdf" if os.path.exists("resume_ml.pdf") else "resume.pdf"
 
+print("USING", BASE)
+
 with httpx.Client(timeout=240) as c:
+    # Create the test user if it does not exist yet (an error here is fine)
+    r = c.post(f"{BASE}/auth/register", json={"email": EMAIL, "password": PASSWORD})
+    print("REGISTER", r.status_code, "(200 = created, other = already exists)")
+
     r = c.post(f"{BASE}/auth/login", json={"email": EMAIL, "password": PASSWORD})
     r.raise_for_status()
     headers = {"Authorization": "Bearer " + r.json()["token"]}
