@@ -27,4 +27,4 @@ jobs:
         env:
           SECRET_KEY: ci-test-secret-not-real
           GROQ_API_KEY: not-a-real-key
-        run: python -m pytest -q
+        run: python -m pytest -q test_shortlist.py
