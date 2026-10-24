@@ -2,7 +2,7 @@ import httpx
 
 BASE = "http://127.0.0.1:8001"
 EMAIL = "test@example.com"
-PASSWORD = "testpass123"
+PASSWORD = "TestPass12345"
 
 body = {
     "job": {"title": "ML Intern", "company": "Test Co", "text": "Fictional posting text."},
@@ -22,6 +22,10 @@ body = {
 }
 
 with httpx.Client(timeout=60) as c:
+    # Create the test user if it does not exist yet (an error here is fine)
+    r = c.post(f"{BASE}/auth/register", json={"email": EMAIL, "password": PASSWORD})
+    print("REGISTER", r.status_code, "(200 = created, other = already exists)")
+
     r = c.post(f"{BASE}/auth/login", json={"email": EMAIL, "password": PASSWORD})
     r.raise_for_status()
     h = {"Authorization": "Bearer " + r.json()["token"]}
