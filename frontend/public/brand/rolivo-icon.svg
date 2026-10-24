@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Rolivo">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1B3D"/>
+      <stop offset="1" stop-color="#03081A"/>
+    </linearGradient>
+  </defs>
+  <rect x="3" y="3" width="506" height="506" rx="118" fill="url(#tile)" stroke="#2A4F9A" stroke-opacity="0.55" stroke-width="3"/>
+  <g transform="translate(34 73) scale(1.1)">
+  <defs>
+    <linearGradient id="gMain" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7DF9FF"/>
+      <stop offset="0.34" stop-color="#168BFF"/>
+      <stop offset="0.68" stop-color="#514BFF"/>
+      <stop offset="1" stop-color="#D78BFF"/>
+    </linearGradient>
+    <linearGradient id="gStem" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9AF4FF"/>
+      <stop offset="0.45" stop-color="#2D8CFF"/>
+      <stop offset="1" stop-color="#5B4DFF"/>
+    </linearGradient>
+    <linearGradient id="gLeg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1F6BFF"/>
+      <stop offset="0.55" stop-color="#5B4DFF"/>
+      <stop offset="1" stop-color="#E29BFF"/>
+    </linearGradient>
+    <linearGradient id="gShine" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.75"/>
+      <stop offset="0.5" stop-color="#C4F7FF" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="12"/></filter>
+  </defs>
+
+  <g transform="translate(14 8)">
+    <!-- glow -->
+    <g filter="url(#glow)" opacity="0.55">
+      <path d="M24 28 H112 V286 H64 V66 Z" fill="#2D8CFF"/>
+      <path d="M112 28 H228 C302 28 342 70 342 132 C342 194 301 230 228 230 H112 V166 H222 C260 166 276 153 276 130 C276 107 260 92 222 92 H112 Z" fill="#3D6BFF"/>
+      <path d="M139 176 H228 L352 288 H268 Z" fill="#8B5CF6"/>
+    </g>
+
+    <!-- stem with slanted top-left tip -->
+    <path d="M24 28 H112 V286 H64 V66 Z" fill="url(#gStem)"/>
+    <path d="M68 70 V282 H78 V40 H62 Z" fill="url(#gShine)" opacity="0.5"/>
+
+    <!-- bar + bowl -->
+    <path d="M112 28 H228 C302 28 342 70 342 132 C342 194 301 230 228 230 H112 V166 H222 C260 166 276 153 276 130 C276 107 260 92 222 92 H112 Z" fill="url(#gMain)"/>
+    <path d="M116 33 H226 C290 33 330 64 336 114 C312 94 280 88 222 88 H116 Z" fill="url(#gShine)" opacity="0.5"/>
+
+    <!-- diagonal leg -->
+    <path d="M139 176 H228 L352 288 H268 Z" fill="url(#gLeg)"/>
+    <path d="M150 181 H224 L330 276 H282 Z" fill="url(#gShine)" opacity="0.35"/>
+    <path d="M228 176 L352 288" fill="none" stroke="#C9F9FF" stroke-opacity="0.85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- crisp top edges -->
+    <path d="M24 28 H228 C302 28 342 70 342 132" fill="none" stroke="#C9F9FF" stroke-opacity="0.9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M24 28 L64 66" fill="none" stroke="#C9F9FF" stroke-opacity="0.8" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</g>
+</svg>
