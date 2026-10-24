@@ -1,6 +1,8 @@
+import os
+
 import httpx
 
-BASE = "http://127.0.0.1:8001"
+BASE = os.getenv("API_BASE", "http://127.0.0.1:8001")
 EMAIL = "test@example.com"
 PASSWORD = "TestPass12345"
 
@@ -21,7 +23,9 @@ body = {
     "changes": ["Rewrote the summary."],
 }
 
-with httpx.Client(timeout=60) as c:
+print("USING", BASE)
+
+with httpx.Client(timeout=90) as c:
     # Create the test user if it does not exist yet (an error here is fine)
     r = c.post(f"{BASE}/auth/register", json={"email": EMAIL, "password": PASSWORD})
     print("REGISTER", r.status_code, "(200 = created, other = already exists)")
