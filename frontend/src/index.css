@@ -1,18 +1,32 @@
 :root {
-  /* brand palette */
-  --ink: #05060f;
-  --navy: #0b1230;
-  --navy-2: #121b44;
-  --line: rgba(120, 150, 255, 0.18);
-  --text: #e6ecff;
-  --text-dim: #9fb0d9;
-  --blue: #3b82f6;
-  --cyan: #7df9ff;
-  --violet: #8b5cf6;
-  --green: #34d399;
-  --coral: #ff7a70;
+  /* 60%: deep black base */
+  --ink: #08070b;
 
-  --radius: 16px;
+  /* 30%: indigo and the indigo-tinted surfaces built on it */
+  --indigo: #4e50de;
+  --indigo-soft: #9d9ff5;
+  --indigo-wash: rgba(78, 80, 222, 0.14);
+  --indigo-edge: rgba(78, 80, 222, 0.45);
+  --panel: #0f0e1a;
+  --panel-2: #151429;
+  --line: rgba(120, 122, 235, 0.16);
+  --line-strong: rgba(120, 122, 235, 0.3);
+
+  /* text */
+  --text: #f3f2f8;
+  --text-dim: #a5a4c2;
+  --text-faint: #6f6e8f;
+
+  /* 10%: neon red, only where the eye should land (logo, main action, rule) */
+  --red: #f32e35;
+  --red-hot: #ff5359;
+  --red-glow: rgba(243, 46, 53, 0.4);
+  --link: #9d9ff5;
+
+  /* status colours stay away from the brand red so problems stand out */
+  --green: #5cc8a1;
+  --amber: #f2b04a;
+
   --font-body: "Figtree", system-ui, sans-serif;
   --font-head: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
 
@@ -49,13 +63,103 @@ h3 {
 }
 
 a {
-  color: var(--cyan);
+  color: var(--link);
 }
 
 button,
 input,
 textarea {
   font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--indigo-soft);
+  outline-offset: 3px;
+}
+
+/* ---------- shared pieces used on every page ---------- */
+
+.page-title {
+  font-size: clamp(2.6rem, 6.2vw, 4.6rem);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.page-sub {
+  margin: 22px 0 36px;
+  max-width: 46ch;
+  font-size: clamp(1.05rem, 1.6vw, 1.4rem);
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 18px 32px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn-red {
+  background: var(--red);
+  color: #fff;
+}
+.btn-red:hover:not(:disabled) {
+  background: var(--red-hot);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px var(--red-glow);
+}
+.btn-ghost {
+  background: transparent;
+  border-color: var(--line-strong);
+  color: var(--text-dim);
+}
+.btn-ghost:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--text-faint);
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 34px;
+}
+
+/* fine web strands in the page corners (see WebCorner.jsx) */
+.web {
+  position: absolute;
+  width: min(62vw, 560px);
+  height: auto;
+  color: var(--indigo-soft);
+  opacity: 0.1;
+  pointer-events: none;
+}
+.web-tl {
+  top: 0;
+  left: 0;
+}
+.web-br {
+  right: 0;
+  bottom: 0;
+  transform: rotate(180deg);
 }
 
 @media (prefers-reduced-motion: reduce) {

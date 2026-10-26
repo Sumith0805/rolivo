@@ -1,0 +1,390 @@
+/* ---------- shared form and notice styles ---------- */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.notice {
+  margin: 18px 0 0;
+  padding: 12px 16px;
+  border: 1px solid rgba(242, 176, 74, 0.4);
+  border-radius: 14px;
+  background: rgba(242, 176, 74, 0.08);
+  color: #f6cd8f;
+  font-size: 0.95rem;
+}
+.notice.ok {
+  border-color: rgba(92, 200, 161, 0.4);
+  background: rgba(92, 200, 161, 0.08);
+  color: #9fdcc4;
+}
+
+.fineprint {
+  margin: 18px 0 36px;
+  font-size: 0.9rem;
+  color: var(--text-faint);
+}
+
+/* ---------- Resume step ---------- */
+
+.drop {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  max-width: 760px;
+  padding: 56px 24px;
+  border: 1.5px dashed var(--line-strong);
+  border-radius: 28px;
+  background: var(--panel);
+  text-align: center;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+.drop.over {
+  border-color: var(--indigo);
+  background: var(--indigo-wash);
+}
+.drop.has-file {
+  border-style: solid;
+  border-color: var(--indigo-edge);
+}
+.drop-name {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 1.6rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.drop-hint {
+  margin: 0 0 16px;
+  color: var(--text-dim);
+}
+.drop .btn {
+  padding: 12px 24px;
+  font-size: 1rem;
+}
+
+/* ---------- Job step ---------- */
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  max-width: 860px;
+  margin-bottom: 18px;
+}
+.fields label,
+.block-label {
+  display: grid;
+  gap: 8px;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+.fields label span {
+  color: var(--text-faint);
+}
+.block-label {
+  max-width: 860px;
+}
+
+.fields input,
+.block-label textarea {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel);
+  color: var(--text);
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.block-label textarea {
+  min-height: 300px;
+  line-height: 1.55;
+  resize: vertical;
+}
+.fields input:focus,
+.block-label textarea:focus {
+  border-color: rgba(78, 80, 222, 0.9);
+  box-shadow: 0 0 0 3px rgba(78, 80, 222, 0.25);
+}
+.count {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-faint);
+}
+
+.working {
+  display: grid;
+  gap: 16px;
+  max-width: 760px;
+}
+.shimmer {
+  height: 18px;
+  border-radius: 9px;
+  background: linear-gradient(90deg, #14132a 25%, #26254f 50%, #14132a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+.shimmer.short {
+  width: 60%;
+}
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---------- Analysis step ---------- */
+
+.rings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  max-width: 900px;
+}
+.ring {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  margin: 0;
+  padding: 28px 16px 24px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--panel);
+}
+.ring-dial {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+.ring-track {
+  fill: none;
+  stroke: #1b1a33;
+  stroke-width: 12;
+}
+.ring-bar {
+  fill: none;
+  stroke: var(--red);
+  stroke-width: 12;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.ring-num {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-head);
+  font-size: 2.8rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+.ring figcaption {
+  display: grid;
+  gap: 2px;
+  text-align: center;
+}
+.ring figcaption span {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+/* ---------- panels with rows (what to fix, what the guard did) ---------- */
+
+.panel-title {
+  margin-bottom: 8px;
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--text-dim);
+}
+
+.rows {
+  max-width: 900px;
+  list-style: none;
+}
+ul.rows {
+  margin: 0;
+  padding: 0;
+}
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 0;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+  font-size: 1.1rem;
+  line-height: 1.45;
+}
+.row i {
+  flex: none;
+  width: 1.2em;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--red);
+  text-align: center;
+}
+.row.warn i,
+.row.flag i {
+  color: var(--amber);
+}
+.row.ok i,
+.row.note i {
+  color: var(--indigo-soft);
+}
+
+.level {
+  flex: none;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  font-size: 0.8rem;
+  font-style: normal;
+  color: var(--text-dim);
+}
+.level.high {
+  border-color: rgba(242, 176, 74, 0.6);
+  color: var(--amber);
+}
+.level.medium {
+  border-color: rgba(242, 176, 74, 0.35);
+  color: #d9a255;
+}
+
+/* ---------- Rewrite step ---------- */
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6em;
+  padding: 12px 22px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 1.2rem;
+  cursor: default;
+}
+.pill small {
+  font-size: 0.8rem;
+  color: var(--indigo-soft);
+}
+.pill.on {
+  border-color: var(--indigo-edge);
+  background: var(--indigo-wash);
+  color: var(--text);
+}
+.pill:disabled:not(.on) {
+  opacity: 0.55;
+}
+
+.rw {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.guard {
+  position: sticky;
+  top: 120px;
+  max-width: none;
+}
+.guard .actions {
+  margin-top: 24px;
+}
+.guard .btn {
+  padding: 18px 30px;
+}
+
+/* the white resume paper */
+.paper {
+  padding: clamp(24px, 4vw, 44px);
+  border-radius: 18px;
+  background: #fff;
+  color: #1b1b1b;
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+.paper h2 {
+  font-family: var(--font-body);
+  font-size: 1.9rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+}
+.paper-headline {
+  margin: 2px 0 0;
+  color: #444;
+}
+.paper-contact {
+  margin: 4px 0 14px;
+  font-size: 0.82rem;
+  color: #333;
+}
+.paper h3 {
+  margin: 18px 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--accent);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.paper p {
+  margin: 4px 0;
+}
+.paper ul {
+  margin: 4px 0 10px;
+  padding-left: 1.2em;
+}
+.paper li {
+  margin: 2px 0;
+}
+.paper mark {
+  padding: 0 4px;
+  border-radius: 4px;
+  background: #ffe2a8;
+  color: #6a3f00;
+}
+
+@media (max-width: 1000px) {
+  .rw {
+    grid-template-columns: 1fr;
+  }
+  .guard {
+    position: static;
+  }
+  .panel {
+    padding: 24px;
+  }
+}
+@media (max-width: 520px) {
+  .btn {
+    padding: 15px 24px;
+    font-size: 1.05rem;
+  }
+  .pill {
+    font-size: 1rem;
+    padding: 10px 16px;
+  }
+}

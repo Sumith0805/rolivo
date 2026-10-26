@@ -1,0 +1,122 @@
+.shell-head {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--ink);
+  border-bottom: 2px solid var(--red);
+}
+
+.shell-inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  max-width: 1520px;
+  height: 94px;
+  margin: 0 auto;
+  padding: 0 clamp(18px, 4vw, 44px);
+}
+
+.wordmark {
+  margin-right: auto;
+  font-family: var(--font-head);
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  text-decoration: none;
+}
+.wordmark span {
+  color: var(--red);
+  text-shadow: 0 0 22px var(--red-glow);
+}
+
+.steps {
+  display: flex;
+  gap: 6px;
+}
+
+.step {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.55em;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-size: 1.2rem;
+  color: var(--text-dim);
+  text-decoration: none;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.step b {
+  font-weight: 500;
+  color: var(--red);
+}
+a.step:hover {
+  color: var(--text);
+}
+.step.on {
+  background: #17163a;
+  box-shadow: inset 0 0 0 1px var(--indigo-edge);
+  color: var(--text);
+  font-weight: 600;
+}
+.step.off {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.signout {
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-faint);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+.signout:hover {
+  color: var(--text);
+  border-color: var(--line-strong);
+}
+
+.shell-main {
+  max-width: 1520px;
+  margin: 0 auto;
+  padding: clamp(36px, 6vw, 72px) clamp(18px, 4vw, 44px) 120px;
+}
+
+/* phones: the steps move to a bar at the bottom of the screen */
+@media (max-width: 820px) {
+  .shell-inner {
+    height: 68px;
+  }
+  .wordmark {
+    font-size: 1.4rem;
+  }
+  .steps {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 30;
+    justify-content: space-around;
+    gap: 2px;
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+    background: rgba(8, 7, 11, 0.96);
+    border-top: 1px solid var(--line);
+    backdrop-filter: blur(10px);
+  }
+  .step {
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 6px;
+    border-radius: 14px;
+    font-size: 0.8rem;
+  }
+}

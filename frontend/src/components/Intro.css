@@ -1,0 +1,73 @@
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #08070b;
+  transition: opacity 0.45s ease;
+}
+.intro.leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-amb {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background:
+    radial-gradient(60vw 30vh at 50% 52%, rgba(243, 46, 53, 0.3), transparent 70%),
+    radial-gradient(95vw 55vh at 50% 112%, rgba(78, 80, 222, 0.4), transparent 70%);
+}
+
+.intro-svg {
+  position: relative;
+  filter: drop-shadow(0 0 16px rgba(243, 46, 53, 0.35));
+  width: min(94vw, 1180px);
+  height: auto;
+  aspect-ratio: 1760 / 600;
+  overflow: visible;
+}
+
+.intro-svg .vb {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+.intro-svg .fb {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.intro-tag {
+  fill: #a5a4c2;
+  font-family: var(--font-body, system-ui, sans-serif);
+  font-size: 26px;
+  letter-spacing: 0.5em;
+}
+
+.intro-skip {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 222, 222, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #a99c9a;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+.intro-skip:hover {
+  color: #f4ecea;
+  border-color: rgba(255, 222, 222, 0.32);
+}
+
+.intro-svg .core {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
