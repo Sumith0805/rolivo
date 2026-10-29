@@ -1,0 +1,70 @@
+.reveal {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: clamp(16px, 4vw, 48px);
+  margin: 0 0 28px;
+  padding: 28px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: linear-gradient(135deg, var(--panel), var(--panel-2));
+}
+.reveal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.07) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: reveal-sheen 1.4s var(--ease-out) 1.6s both;
+}
+@keyframes reveal-sheen {
+  to {
+    transform: translateX(120%);
+  }
+}
+.reveal-col {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+.reveal-label {
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.reveal-num {
+  font-family: var(--font-head);
+  font-size: clamp(3.2rem, 8vw, 5.4rem);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.reveal-num.dim {
+  color: var(--text-dim);
+}
+.reveal-num.hot {
+  color: var(--text);
+  text-shadow: 0 0 32px var(--red-glow);
+}
+.reveal-arrow {
+  width: clamp(70px, 12vw, 120px);
+  color: var(--indigo-soft);
+}
+.reveal-chip {
+  padding: 8px 16px;
+  border: 1px solid var(--indigo-edge);
+  border-radius: 999px;
+  background: var(--indigo-wash);
+  color: var(--indigo-soft);
+  font-weight: 600;
+}
+.reveal-chip.down {
+  border-color: var(--amber);
+  color: var(--amber);
+  background: transparent;
+}

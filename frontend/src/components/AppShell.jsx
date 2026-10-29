@@ -1,31 +1,31 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { clearToken } from "../api.js";
+import { Suspense } from "react";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { MotionConfig } from "motion/react";
+import Loader3D from "./Loader3D.jsx";
 import { useFlow } from "../flow.jsx";
+import { ProfileProvider } from "../profileContext.jsx";
+import AccountMenu from "./AccountMenu.jsx";
+import TiltEffect from "./TiltEffect.jsx";
 import "./AppShell.css";
 import "../pages/pages.css";
 
-export default function AppShell() {
-  const navigate = useNavigate();
-  const { resumeFile, result } = useFlow();
-
+function Shell() {
+  const { hasResume, fromProfile, result } = useFlow();
+  const { pathname } = useLocation();
   // a step opens only once the earlier steps have what they need
   const steps = [
     { to: "/resume", label: "Resume", n: 1, open: true },
-    { to: "/job", label: "Job", n: 2, open: Boolean(resumeFile) },
+    { to: "/job", label: "Job", n: 2, open: Boolean(hasResume || fromProfile) },
     { to: "/analysis", label: "Analysis", n: 3, open: Boolean(result) },
     { to: "/rewrite", label: "Rewrite", n: 4, open: Boolean(result) },
   ];
 
-  function signOut() {
-    clearToken();
-    navigate("/signin", { replace: true });
-  }
-
   return (
     <div className="shell">
+      <TiltEffect />
       <header className="shell-head">
         <div className="shell-inner">
-          <NavLink to="/resume" className="wordmark" aria-label="Rolivo">
+          <NavLink to="/dashboard" className="wordmark" aria-label="Rolivo">
             <span>R</span>OLIVO
           </NavLink>
           <nav className="steps" aria-label="Steps">
@@ -47,14 +47,26 @@ export default function AppShell() {
               ),
             )}
           </nav>
-          <button type="button" className="signout" onClick={signOut}>
-            Sign out
-          </button>
+          <AccountMenu />
         </div>
       </header>
       <main className="shell-main">
-        <Outlet />
+        <div key={pathname} className="route">
+          <Suspense fallback={<Loader3D full label="Loading" />}>
+            <Outlet />
+          </Suspense>
+        </div>
       </main>
     </div>
+  );
+}
+
+export default function AppShell() {
+  return (
+    <MotionConfig reducedMotion="user">
+      <ProfileProvider>
+        <Shell />
+      </ProfileProvider>
+    </MotionConfig>
   );
 }

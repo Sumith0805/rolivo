@@ -1,0 +1,209 @@
+/* Cinematic layer: page curtain, 3D scenes, 3D cards, 3D loader.
+   Switched off by html[data-cinema="off"] (Settings, or reduced motion). Transform and opacity only. */
+
+.shell-main { perspective: 1400px; }
+
+/* ---------- the curtain: a sweep with the logo between pages ---------- */
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.curtain i {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.curtain .c-a {
+  background: linear-gradient(180deg, #5b5df0, #2b2c8f);
+  animation: sweep 0.62s cubic-bezier(0.76, 0, 0.24, 1) both;
+}
+.curtain .c-b {
+  background: #08070b;
+  border-top: 3px solid #f32e35;
+  box-shadow: 0 -30px 80px rgba(243, 46, 53, 0.35);
+  animation: sweep 0.62s cubic-bezier(0.76, 0, 0.24, 1) 0.07s both;
+}
+.curtain img {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 0 24px rgba(243, 46, 53, 0.65));
+  animation: curtain-logo 0.62s ease both;
+}
+@keyframes sweep {
+  0%   { transform: translateY(100%); }
+  42%  { transform: translateY(0); }
+  58%  { transform: translateY(0); }
+  100% { transform: translateY(-100%); }
+}
+@keyframes curtain-logo {
+  0%, 22%  { opacity: 0; transform: scale(0.6) rotateY(-70deg); }
+  42%, 56% { opacity: 1; transform: scale(1) rotateY(0deg); }
+  80%, 100% { opacity: 0; transform: scale(1.25) rotateY(60deg); }
+}
+/* the new page waits behind the curtain, then swings in with depth */
+.route.cinema {
+  animation: cine-in 0.55s var(--ease-out) 0.27s both;
+  transform-origin: 50% 0;
+}
+@keyframes cine-in {
+  from {
+    opacity: 0;
+    transform: perspective(1400px) translate3d(0, 26px, -70px) rotateX(7deg);
+  }
+}
+
+/* ---------- 3D loader ---------- */
+.loader3d {
+  display: grid;
+  justify-items: center;
+  gap: 22px;
+  color: var(--text-dim, #8f8eb0);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+.loader3d.full {
+  min-height: 55vh;
+  align-content: center;
+}
+.loader3d.small {
+  gap: 12px;
+  padding: 18px 0;
+  justify-items: start;
+}
+.loader3d p { margin: 0; animation: label-fade 1.6s ease-in-out infinite; }
+@keyframes label-fade { 50% { opacity: 0.45; } }
+.l3-stage {
+  --s: 58px;
+  position: relative;
+  width: var(--s);
+  height: calc(var(--s) * 1.5);
+  perspective: 600px;
+  display: grid;
+  place-items: center;
+}
+.small .l3-stage { --s: 34px; }
+.l3-cube {
+  position: relative;
+  width: var(--s);
+  height: var(--s);
+  transform-style: preserve-3d;
+  animation: cube-turn 3.4s linear infinite;
+}
+.l3-cube .f {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  border-radius: 6px;
+  backface-visibility: visible;
+}
+.f-front  { transform: translateZ(calc(var(--s) / 2)); background: linear-gradient(135deg, rgba(243, 46, 53, 0.92), rgba(160, 20, 30, 0.9)); }
+.f-back   { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); background: rgba(78, 80, 222, 0.75); }
+.f-right  { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); background: rgba(78, 80, 222, 0.85); }
+.f-left   { transform: rotateY(-90deg) translateZ(calc(var(--s) / 2)); background: rgba(243, 46, 53, 0.75); }
+.f-top    { transform: rotateX(90deg) translateZ(calc(var(--s) / 2)); background: rgba(235, 234, 250, 0.82); }
+.f-bottom { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); background: rgba(40, 41, 120, 0.9); }
+@keyframes cube-turn {
+  from { transform: rotateX(-24deg) rotateY(0deg); }
+  to   { transform: rotateX(-24deg) rotateY(360deg); }
+}
+.l3-shadow {
+  position: absolute;
+  bottom: 0;
+  width: var(--s);
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(243, 46, 53, 0.5), transparent);
+  animation: shadow-breathe 1.7s ease-in-out infinite;
+}
+@keyframes shadow-breathe {
+  50% { transform: scale(0.6); opacity: 0.5; }
+}
+
+/* ---------- sign-in card leans toward the pointer (app cards use TiltEffect) ---------- */
+html[data-cinema="on"] .auth-card {
+  transition: transform 0.12s ease-out, border-color 0.2s ease, background 0.2s ease, box-shadow 0.25s ease;
+}
+html[data-cinema="on"] .auth-card.tilting {
+  transform: perspective(1300px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+}
+
+/* ---------- the 3D resume deck on the dashboard ---------- */
+.deck {
+  position: relative;
+  perspective: 1200px;
+  --mx: 0;
+  --my: 0;
+}
+.deck-sway { animation: deck-sway 9s ease-in-out infinite alternate; transform-style: preserve-3d; }
+@keyframes deck-sway {
+  from { transform: translateY(0) rotateZ(-0.8deg); }
+  to   { transform: translateY(-9px) rotateZ(0.8deg); }
+}
+.deck-3d {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(calc(5deg + var(--my) * -14deg)) rotateY(calc(-16deg + var(--mx) * 30deg));
+  transition: transform 0.3s ease-out;
+}
+.deck-front { transform: translateZ(0); }
+.deck-card {
+  position: absolute;
+  left: 7.7%;
+  top: 3.6%;
+  width: 77%;
+  height: 91%;
+  border-radius: 14px;
+  background:
+    linear-gradient(#2a2956, #2a2956) 14% 12% / 38% 3.2% no-repeat,
+    linear-gradient(#25244d, #25244d) 14% 30% / 66% 1.8% no-repeat,
+    linear-gradient(#25244d, #25244d) 14% 38% / 58% 1.8% no-repeat,
+    linear-gradient(#25244d, #25244d) 14% 46% / 62% 1.8% no-repeat,
+    #14132a;
+  border: 1.5px solid #2f2e66;
+  box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.9);
+}
+.deck-card.c2 { transform: translate3d(34px, -8px, -70px) rotateZ(3deg); }
+.deck-card.c3 { transform: translate3d(66px, -14px, -150px) rotateZ(6deg); opacity: 0.8; }
+.deck-floor {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -26px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(78, 80, 222, 0.5), transparent);
+  filter: blur(6px);
+}
+
+/* ---------- sign-in: the papers sit at different depths and follow the pointer ---------- */
+html[data-cinema="on"] .auth-art span:nth-child(1) { translate: calc(var(--mx, 0) * -46px) calc(var(--my, 0) * -30px); }
+html[data-cinema="on"] .auth-art span:nth-child(2) { translate: calc(var(--mx, 0) * 70px) calc(var(--my, 0) * 40px); }
+html[data-cinema="on"] .auth-art span:nth-child(3) { translate: calc(var(--mx, 0) * -90px) calc(var(--my, 0) * 56px); }
+.auth-art span { transition: translate 0.5s ease-out; }
+.auth { perspective: 1300px; --mx: 0; --my: 0; }
+
+/* ---------- off switch ---------- */
+html[data-cinema="off"] .curtain,
+html[data-cinema="off"] .shell::before,
+html[data-cinema="off"] .shell::after { display: none; }
+html[data-cinema="off"] .route.cinema { animation: route-in 0.2s ease both; }
+html[data-cinema="off"] .deck-3d { transform: none; }
+html[data-cinema="off"] .deck-sway,
+html[data-cinema="off"] .deck-card { animation: none; }
+html[data-cinema="off"] .deck-card.c2,
+html[data-cinema="off"] .deck-card.c3 { display: none; }
+html[data-cinema="off"] .auth-art { display: none; }
+
+@media (max-width: 820px) {
+  .deck-card.c2, .deck-card.c3 { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .curtain { display: none; }
+  .l3-cube, .l3-shadow, .deck-sway { animation: none; }
+  .l3-cube { transform: rotateX(-24deg) rotateY(35deg); }
+}

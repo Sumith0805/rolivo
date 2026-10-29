@@ -1,0 +1,21 @@
+/* 3D tilt and a soft light that follows the cursor on cards */
+:is(.shell, .land) .lib-card:hover {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-4px);
+}
+:is(.shell, .land) .lib-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(157, 159, 245, 0.16), transparent 60%);
+  transition: opacity 0.25s ease;
+}
+:is(.shell, .land) .lib-card:hover::before {
+  opacity: 1;
+}
+
+/* red buttons lean toward the cursor */
+:is(.shell, .land) .btn-red:not(:disabled):hover {
+  transform: translate(var(--tx, 0px), var(--ty, 0px)) translateY(-2px);
+}

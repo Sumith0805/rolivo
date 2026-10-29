@@ -39,14 +39,17 @@ def current_user(
     db: Session = Depends(get_db),
 ) -> User:
     if creds is None:
-        raise HTTPException(status_code=401, detail="Please sign in.")
+        raise HTTPException(status_code=401, detail="Please signin.")
     try:
         payload = jwt.decode(creds.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        # a link meant for resetting a password must never work as a sign-in token
+        if payload.get("purpose"):
+            raise ValueError("not a session token")
         user = db.get(User, int(payload["sub"]))
     except Exception:
         raise HTTPException(status_code=401, detail="Your session expired. Please sign in again.")
     if user is None:
-        raise HTTPException(status_code=401, detail="Please sign in.")
+        raise HTTPException(status_code=401, detail="Please signin.")
     return user
 
 
@@ -60,7 +63,7 @@ def register(body: Credentials, db: Session = Depends(get_db)):
     if len(body.password) > 128:
         raise HTTPException(status_code=400, detail="That password is too long.")
     if db.scalar(select(User).where(User.email == email)):
-        raise HTTPException(status_code=409, detail="An account with this email already exists.")
+        raise HTTPException(status_code=409, detail="An account with this email already exists. Sign in instead, or reset your password if you forgot it.")
     user = User(email=email, password_hash=ph.hash(body.password))
     db.add(user)
     db.commit()
@@ -72,14 +75,14 @@ def register(body: Credentials, db: Session = Depends(get_db)):
 def login(body: Credentials, db: Session = Depends(get_db)):
     email = body.email.strip().lower()
     user = db.scalar(select(User).where(User.email == email))
-    ok = False
-    if user:
-        try:
-            ok = ph.verify(user.password_hash, body.password)
-        except (VerifyMismatchError, InvalidHashError):
-            ok = False
+    if user is None:
+        raise HTTPException(status_code=401, detail="No account was found with this email. Check the spelling, or create an account.")
+    try:
+        ok = ph.verify(user.password_hash, body.password)
+    except (VerifyMismatchError, InvalidHashError):
+        ok = False
     if not ok:
-        raise HTTPException(status_code=401, detail="Email or password is incorrect.")
+        raise HTTPException(status_code=401, detail="That password is wrong. Try again, or use “Forgot password” to set a new one.")
     return {"token": make_token(user.id), "email": user.email}
 
 

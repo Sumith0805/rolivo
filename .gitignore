@@ -27,3 +27,9 @@ backend/data/
 backend/test_shortlist.db
 backend/.pytest_cache/
 backend/*.db
+
+backend/my_resumes/
+backend/my_jobs/
+backend/eval_results*.csv
+backend/diag_v13.py
+backend/diag2_v13.py

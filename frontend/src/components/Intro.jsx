@@ -6,6 +6,12 @@ const FADE = 450;
 
 const bigT = (s) => `translate(880px,300px) scale(${s}) translate(-164px,-130px)`;
 const FINAL = "translate(170px,171px) scale(1) translate(0px,0px)";
+// a few soft specks of dust that drift through the light
+const MOTES = [
+  { x: 18, y: 62, s: 5 }, { x: 31, y: 40, s: 3 }, { x: 44, y: 70, s: 6 }, { x: 52, y: 33, s: 4 },
+  { x: 63, y: 66, s: 3 }, { x: 72, y: 44, s: 6 }, { x: 81, y: 58, s: 4 }, { x: 27, y: 52, s: 4 },
+  { x: 58, y: 54, s: 3 }, { x: 38, y: 60, s: 5 }, { x: 67, y: 36, s: 3 }, { x: 47, y: 48, s: 4 },
+];
 const LETTERS = [
   { id: "O", x: 542 },
   { id: "L", x: 802 },
@@ -24,6 +30,15 @@ export default function Intro({ onDone }) {
   }, [onDone]);
 
   const leave = useCallback(() => setLeaving(true), []);
+
+  // Enter or Escape skips the intro
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape" || e.key === "Enter") leave();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [leave]);
 
   // hand control back to the app once the fade-out has finished
   useEffect(() => {
@@ -56,6 +71,18 @@ export default function Intro({ onDone }) {
       return a;
     };
 
+    // the whole frame starts soft and pulls into focus, like a lens finding its distance
+    A($(".intro-svg"), [{ filter: "blur(14px)" }, { filter: "blur(0px)" }], {
+      duration: 2600,
+      delay: 500,
+      easing: "cubic-bezier(.3,.1,.2,1)",
+      composite: "replace",
+    });
+    A($(".intro-bloom"), [{ opacity: 0, transform: "scale(.7)" }, { opacity: 0.85, transform: "scale(1)", offset: 0.55 }, { opacity: 0.45, transform: "scale(1.08)" }], {
+      duration: 5200,
+      delay: 900,
+      easing: "ease-in-out",
+    });
     // slow camera pull-back over the whole sequence
     A($(".intro-svg"), [{ transform: "scale(1.07)" }, { transform: "scale(1)" }], {
       duration: TOTAL,
@@ -66,83 +93,35 @@ export default function Intro({ onDone }) {
       delay: 600,
       easing: "ease-in-out",
     });
-    el.querySelectorAll(".web").forEach((w) =>
-      A(w, [{ opacity: 0 }, { opacity: 0.1 }], { duration: 1800, delay: 900, easing: "ease-out" }),
-    );
-
-    // 1) one thin thread of light opens into soft shafts
-    A(
-      $("#b2"),
-      [
-        { opacity: 0, transform: "scaleX(.06)" },
-        { opacity: 1, transform: "scaleX(.09)", offset: 0.45 },
-        { opacity: 0.95, transform: "scaleX(1)" },
-      ],
-      { duration: 1000, delay: 250, easing: "cubic-bezier(.3,.1,.2,1)" },
-    );
-    A(
-      $("#b1"),
-      [
-        { opacity: 0, transform: "translateX(125px) scaleX(.1)" },
-        { opacity: 0.85, transform: "translateX(0) scaleX(1)" },
-      ],
-      { duration: 900, delay: 700 },
-    );
-    A(
-      $("#b3"),
-      [
-        { opacity: 0, transform: "translateX(-130px) scaleX(.1)" },
-        { opacity: 0.85, transform: "translateX(0) scaleX(1)" },
-      ],
-      { duration: 900, delay: 700 },
-    );
-    ["#b1", "#b2", "#b3"].forEach((id) =>
-      A($(id), [{ opacity: 0.9 }, { opacity: 0 }], {
-        duration: 800,
-        delay: 1700,
-        easing: "ease-in",
-        composite: "replace",
-        fill: "forwards",
-      }),
-    );
-
-    // crisp bright threads at the heart of each shaft
-    A($("#c2"), [{ opacity: 1, transform: "scaleY(0)" }, { opacity: 1, transform: "scaleY(1)" }], {
-      duration: 800,
-      delay: 150,
-      easing: "cubic-bezier(.3,.6,.2,1)",
+    // 1) out of the dark: the glow warms up, dust drifts through it
+    el.querySelectorAll(".mote").forEach((m, i) => {
+      const drift = 40 + (i % 5) * 18;
+      A(
+        m,
+        [
+          { opacity: 0, transform: "translate(0,0)" },
+          { opacity: 0.55, offset: 0.35 },
+          { opacity: 0, transform: `translate(${i % 2 ? drift : -drift}px,${-drift * 1.6}px)` },
+        ],
+        { duration: 4200 + (i % 4) * 700, delay: 300 + i * 230, easing: "ease-in-out" },
+      );
     });
-    ["#c1", "#c3"].forEach((id) =>
-      A($(id), [{ opacity: 0, transform: "scaleY(1)" }, { opacity: 0.9, transform: "scaleY(1)" }], {
-        duration: 700,
-        delay: 700,
-      }),
-    );
-    ["#c1", "#c2", "#c3"].forEach((id) =>
-      A($(id), [{ opacity: 0.9 }, { opacity: 0 }], {
-        duration: 700,
-        delay: 1700,
-        easing: "ease-in",
-        composite: "replace",
-        fill: "forwards",
-      }),
-    );
 
-    // 2) the light folds into the three parts of the R
+    // 2) the R comes into focus, one part at a time
     const R = $("#R");
     R.style.transform = bigT(1.3);
     const piece = (id, delay) =>
       A(
         $(id),
         [
-          { opacity: 0, transform: "scale(.12,1.5)", filter: "blur(12px)" },
-          { opacity: 1, transform: "scale(1,1)", filter: "blur(0px)" },
+          { opacity: 0, transform: "scale(1.14)", filter: "blur(22px)" },
+          { opacity: 1, transform: "scale(1)", filter: "blur(0px)" },
         ],
-        { duration: 1200, delay, easing: "cubic-bezier(.25,.7,.2,1)" },
+        { duration: 1500, delay, easing: "cubic-bezier(.2,.6,.2,1)" },
       );
-    piece("#pStem", 1200);
-    piece("#pBowl", 1350);
-    piece("#pLeg", 1500);
+    piece("#pStem", 900);
+    piece("#pBowl", 1100);
+    piece("#pLeg", 1300);
 
     // 3) hold on the R: slow push-in with a soft edge glow
     A(R, [{ transform: bigT(1.3) }, { transform: bigT(1.38) }], {
@@ -173,7 +152,7 @@ export default function Intro({ onDone }) {
       A(
         g,
         [
-          { opacity: 0, transform: `translate(${x - 190}px,171px)`, filter: "blur(8px)" },
+          { opacity: 0, transform: `translate(${x - 120}px,171px)`, filter: "blur(14px)" },
           { opacity: 1, transform: `translate(${x}px,171px)`, filter: "blur(0px)" },
         ],
         { duration: 1300, delay: 3500 + i * 110, easing: "cubic-bezier(.2,.65,.2,1)" },
@@ -186,15 +165,17 @@ export default function Intro({ onDone }) {
       delay: 4200,
       easing: "ease-out",
     });
+    // one wide, soft wash of light (no hard edge) passes over the letters
     A(
       $("#sw"),
-      [
-        { transform: "translateX(0) skewX(-18deg)" },
-        { transform: "translateX(2200px) skewX(-18deg)" },
-      ],
-      { duration: 1500, delay: 4600, easing: "ease-in-out" },
+      [{ transform: "translateX(0)" }, { transform: "translateX(2500px)" }],
+      { duration: 2400, delay: 4300, easing: "cubic-bezier(.45,0,.35,1)" },
     );
-    A($(".intro-tag"), [{ opacity: 0 }, { opacity: 1 }], { duration: 900, delay: 5000 });
+    A($(".intro-tag"), [{ opacity: 0, letterSpacing: "0.8em" }, { opacity: 1, letterSpacing: "0.5em" }], {
+      duration: 1500,
+      delay: 4800,
+      easing: "cubic-bezier(.2,.6,.2,1)",
+    });
 
     const timer = setTimeout(() => setLeaving(true), TOTAL);
     return () => {
@@ -206,6 +187,12 @@ export default function Intro({ onDone }) {
   return (
     <div className={`intro${leaving ? " leaving" : ""}`} ref={root}>
       <div className="intro-amb" />
+      <div className="intro-bloom" aria-hidden="true" />
+      <div className="intro-motes" aria-hidden="true">
+        {MOTES.map((m, i) => (
+          <i className="mote" key={i} style={{ left: `${m.x}%`, top: `${m.y}%`, width: m.s, height: m.s }} />
+        ))}
+      </div>
 
       <svg className="intro-svg" viewBox="0 0 1760 600" role="img" aria-label="Rolivo">
         <defs>
@@ -238,7 +225,7 @@ export default function Intro({ onDone }) {
           </linearGradient>
           <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0" stopColor="#fff" stopOpacity="0" />
-            <stop offset=".5" stopColor="#ffd9d2" stopOpacity=".5" />
+            <stop offset=".5" stopColor="#ffd9d2" stopOpacity=".55" />
             <stop offset="1" stopColor="#fff" stopOpacity="0" />
           </linearGradient>
           <filter id="blurBeam" x="-100%" y="-5%" width="300%" height="110%">
@@ -247,8 +234,11 @@ export default function Intro({ onDone }) {
           <filter id="blurCore" x="-400%" y="0%" width="900%" height="100%">
             <feGaussianBlur stdDeviation="1.4" />
           </filter>
+          <filter id="blurWash" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="46" />
+          </filter>
           <filter id="blurFloor" x="-20%" y="-200%" width="140%" height="500%">
-            <feGaussianBlur stdDeviation="16" />
+            <feGaussianBlur stdDeviation="34" />
           </filter>
 
           <path
@@ -278,17 +268,8 @@ export default function Intro({ onDone }) {
           </clipPath>
         </defs>
 
-        {/* light shafts */}
-        <rect id="b1" className="fb" x="690" y="-900" width="110" height="2400" fill="url(#beam)" filter="url(#blurBeam)" opacity="0" />
-        <rect id="b2" className="fb" x="825" y="-900" width="110" height="2400" fill="url(#beam)" filter="url(#blurBeam)" opacity="0" />
-        <rect id="b3" className="fb" x="955" y="-900" width="110" height="2400" fill="url(#beam)" filter="url(#blurBeam)" opacity="0" />
-
-        <rect id="c1" className="core" x="743" y="-300" width="4" height="1200" fill="#ff8f95" filter="url(#blurCore)" opacity="0" />
-        <rect id="c2" className="core" x="878" y="-300" width="4" height="1200" fill="#ff8f95" filter="url(#blurCore)" opacity="0" />
-        <rect id="c3" className="core" x="1008" y="-300" width="4" height="1200" fill="#ff8f95" filter="url(#blurCore)" opacity="0" />
-
         {/* soft floor glow under the wordmark */}
-        <ellipse id="floor" cx="880" cy="476" rx="600" ry="20" fill="rgba(243,46,53,.38)" filter="url(#blurFloor)" opacity="0" />
+        <ellipse id="floor" cx="880" cy="476" rx="640" ry="46" fill="rgba(243,46,53,.2)" filter="url(#blurFloor)" opacity="0" />
 
         {/* the other letters, rolled out from behind the R */}
         <g>
@@ -317,13 +298,16 @@ export default function Intro({ onDone }) {
         </g>
 
         <g clipPath="url(#clipAll)">
-          <rect id="sw" className="vb" x="-320" y="120" width="260" height="400" fill="url(#sweep)" />
+          <rect id="sw" className="vb" x="-900" y="60" width="800" height="480" fill="url(#sweep)" filter="url(#blurWash)" />
         </g>
 
         <text className="intro-tag" x="880" y="535" textAnchor="middle" opacity="0">
           RESUMES TAILORED TO THE JOB
         </text>
       </svg>
+
+      <div className="intro-vignette" aria-hidden="true" />
+      <div className="intro-grain" aria-hidden="true" />
 
       <button type="button" className="intro-skip" onClick={leave}>
         Skip intro

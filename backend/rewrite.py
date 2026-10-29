@@ -6,6 +6,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 
 import jobs
+import links
 import resumes
 from auth import current_user
 from db import User
@@ -13,9 +14,11 @@ from llm import ask_json
 from guard import finalize
 from limits import limit_bullets
 from parsing import clean, text_from_upload
+from profile_merge import merge_profile, pick_projects, read_profile
+from user_profile import clean_profile
 from role_profiles import ROLES, TEMPLATES
 from roles import detect, template_info
-from scoring import analyze, flatten, found_in, lst, s
+from scoring import SYMBOLS, analyze, ats_checks, flatten, found_in, lst, s
 
 router = APIRouter(prefix="/rewrite", tags=["rewrite"])
 
@@ -160,8 +163,8 @@ def enforce(orig, new):
             result.append(entry)
         return result
 
-    out["experience"] = merge("experience", "company", ["title", "company", "location", "dates"])
-    out["projects"] = merge("projects", "name", ["name", "tech"])
+    out["experience"] = merge("experience", "company", ["title", "company", "location", "dates", "link"])
+    out["projects"] = merge("projects", "name", ["name", "tech", "link"])
     return out, removed, notes
 
 
@@ -293,6 +296,9 @@ def generate(resume, job, rid, facts):
         msg = " unsupported items to your original wording."
         notes.append("Reverted " + str(reverted) + msg)
     changes = diff_notes(resume, result, removed)
+    cleaned = polish(result)
+    if cleaned:
+        changes.append("Cleaned " + str(cleaned) + " small ATS issues (symbols, verb tense, summary length).")
     added = add_placeholders(result)
     if added:
         changes.append(
@@ -309,6 +315,101 @@ def generate(resume, job, rid, facts):
     }
 
 
+PRESENT_TO_PAST = {
+    "build": "Built", "builds": "Built", "building": "Built", "develop": "Developed",
+    "develops": "Developed", "developing": "Developed", "design": "Designed",
+    "designs": "Designed", "designing": "Designed", "create": "Created",
+    "creates": "Created", "creating": "Created", "implement": "Implemented",
+    "implements": "Implemented", "implementing": "Implemented", "lead": "Led",
+    "leads": "Led", "leading": "Led", "manage": "Managed", "manages": "Managed",
+    "managing": "Managed", "write": "Wrote", "writes": "Wrote", "writing": "Wrote",
+    "analyze": "Analyzed", "analyzes": "Analyzed", "analyzing": "Analyzed",
+    "deploy": "Deployed", "deploys": "Deployed", "deploying": "Deployed",
+    "automate": "Automated", "automates": "Automated", "automating": "Automated",
+    "improve": "Improved", "improves": "Improved", "improving": "Improved",
+    "train": "Trained", "trains": "Trained", "training": "Trained",
+    "test": "Tested", "tests": "Tested", "testing": "Tested",
+    "coordinate": "Coordinated", "coordinates": "Coordinated", "coordinating": "Coordinated",
+    "support": "Supported", "supports": "Supported", "supporting": "Supported",
+    "prepare": "Prepared", "prepares": "Prepared", "preparing": "Prepared",
+    "run": "Ran", "runs": "Ran", "running": "Ran",
+}
+
+
+def polish(res):
+    """Deterministic ATS clean-up. Changes wording form only, never adds facts."""
+    fixes = 0
+
+    def clean_text(x):
+        nonlocal fixes
+        y = SYMBOLS.sub("", x)
+        y = re.sub(r"[ \t]{2,}", " ", y).strip()
+        if y != x:
+            fixes += 1
+        return y
+
+    res["summary"] = clean_text(s(res.get("summary")))
+    words = res["summary"].split()
+    if len(words) > 60:
+        sentences = re.split(r"(?<=[.!?])\s+", res["summary"])
+        short = ""
+        for sen in sentences:
+            if len((short + " " + sen).split()) <= 60:
+                short = (short + " " + sen).strip()
+        if short:
+            res["summary"] = short
+            fixes += 1
+    for kind in ("experience", "projects"):
+        for e in lst(res.get(kind)):
+            if not isinstance(e, dict):
+                continue
+            out = []
+            for b in lst(e.get("bullets")):
+                b = clean_text(s(b))
+                parts = b.split(None, 1)
+                if parts:
+                    first = parts[0].strip(",.:;").lower()
+                    if first in PRESENT_TO_PAST:
+                        b = PRESENT_TO_PAST[first] + (" " + parts[1] if len(parts) > 1 else "")
+                        fixes += 1
+                if b:
+                    out.append(b)
+            e["bullets"] = out
+    return fixes
+
+
+def ats_block(before_score, res):
+    from ats import report
+    r = report(res)
+    return {
+        "before": before_score,
+        "score": r["score"],
+        "target": r["target"],
+        "reached": r["reached"],
+        "potential": r["potential"],
+        "markers": r["markers"],
+        "holding_back": r["holding_back"],
+    }
+
+
+def keyword_report(a):
+    """The job's keywords, by importance: which the resume shows and which it does not."""
+    out = {}
+    for tier, data in (a.get("tiers") or {}).items():
+        items = data.get("terms") or []
+        if not items:
+            continue
+        out[tier] = {
+            "found": [i["term"] for i in items if i.get("found")],
+            "missing": [
+                {"term": i["term"], "any_of": [m for m in (i.get("any_of") or []) if m != i["term"]][:6]}
+                for i in items
+                if not i.get("found")
+            ],
+        }
+    return out
+
+
 def scores(a):
     return {"match": a["match_score"], "ats": a["ats_score"], "overall": a["overall"]}
 
@@ -323,23 +424,37 @@ async def quick(
     resume_text: str = Form(""),
     job_text: str = Form(...),
     facts: str = Form(""),
+    profile_json: str = Form(""),
     template: str = Form(""),
     user: User = Depends(current_user),
 ):
     if resume_file is not None and resume_file.filename:
-        raw_resume = text_from_upload(resume_file.filename, await resume_file.read())
+        data = await resume_file.read()
+        raw_resume = links.add_block(text_from_upload(resume_file.filename, data), resume_file.filename, data)
     else:
         raw_resume = clean(resume_text)
     job_raw = clean(job_text)
     facts = facts.strip()[:1500]
 
     resume = ask_json(resumes.SYSTEM, raw_resume)
+    links.apply_links(resume, raw_resume)
     job = ask_json(jobs.SYSTEM, job_raw)
     rid, confidence, _ranked = detect(job_raw)
     tid = template if template in TEMPLATES else ROLES[rid]["templates"][0]
 
+    # "before" is the resume as uploaded; the rewrite may also use the saved profile
+    base = resume
+    prof_notes = []
+    raw_profile = read_profile(profile_json)
+    if raw_profile:
+        resume, prof_notes = merge_profile(resume, clean_profile(raw_profile))
+    resume, pick_notes = pick_projects(resume, job)
+
     result, changes, report = generate(resume, job, rid, facts)
-    before = analyze(resume, job)
+    links.restore_links(resume, result)
+    changes = prof_notes + pick_notes + changes
+    report["ats"] = ats_block(ats_checks(base)[1], result)
+    before = analyze(base, job)
     after = analyze(result, job)
     return {
         "role": {
@@ -351,6 +466,8 @@ async def quick(
         "template": template_info(tid),
         "before": scores(before),
         "after": scores(after),
+        "keywords": keyword_report(after),
+        "keywords_before": keyword_report(before),
         "before_fixes": fix_titles(before),
         "after_fixes": fix_titles(after),
         "resume": result,

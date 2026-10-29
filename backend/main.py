@@ -3,13 +3,19 @@ import os
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from account import router as account_router
 from analysis import router as analysis_router
+from cover import router as cover_router
+from ats import router as ats_router
 from auth import router as auth_router
 from db import init_db
+from design import router as design_router
 from export import router as export_router
 from jobs import router as jobs_router
 from library import router as library_router
+from user_profile import router as profile_router
 from ratelimit import ai_limit
+from resume_vault import router as vault_router
 from resumes import router as resumes_router
 from rewrite import router as rewrite_router
 from roles import router as roles_router
@@ -32,12 +38,18 @@ app.add_middleware(
 init_db()
 limited = [Depends(ai_limit)]
 app.include_router(auth_router)
+app.include_router(account_router)
 app.include_router(resumes_router, dependencies=limited)
 app.include_router(jobs_router, dependencies=limited)
 app.include_router(analysis_router, dependencies=limited)
 app.include_router(roles_router)
+app.include_router(ats_router)
+app.include_router(cover_router)
 app.include_router(rewrite_router, dependencies=limited)
 app.include_router(library_router)
+app.include_router(profile_router)
+app.include_router(vault_router)
+app.include_router(design_router)
 app.include_router(export_router)
 
 

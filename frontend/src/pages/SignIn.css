@@ -163,3 +163,44 @@
   font-size: 0.78rem;
   color: var(--text-faint);
 }
+
+.auth-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -4px 0 4px;
+  font-size: 0.9rem;
+}
+.auth-check {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px !important;
+  margin: 0 !important;
+  color: var(--text-dim, #a5a4c2);
+  cursor: pointer;
+}
+.auth-check input {
+  width: auto !important;
+  margin: 0;
+}
+.auth-ok {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(74, 200, 140, 0.4);
+  border-radius: 14px;
+  background: rgba(74, 200, 140, 0.08);
+  color: #b9efd2;
+  line-height: 1.5;
+}
+.auth-btn-link {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+.auth a.link {
+  color: var(--indigo-soft, #a9aaf0);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

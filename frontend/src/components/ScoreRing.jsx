@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import useCountUp from "../useCountUp.js";
 
 const RADIUS = 70;
 const CIRC = 2 * Math.PI * RADIUS;
@@ -6,6 +7,7 @@ const CIRC = 2 * Math.PI * RADIUS;
 export default function ScoreRing({ value, label, note }) {
   const target = Math.max(0, Math.min(100, Number(value) || 0));
   const [shown, setShown] = useState(0);
+  const counted = useCountUp(target, 1300);
 
   // sweep from empty to the score after the first paint
   useEffect(() => {
@@ -14,7 +16,7 @@ export default function ScoreRing({ value, label, note }) {
   }, [target]);
 
   return (
-    <figure className="ring">
+    <figure className={`ring${target >= 90 ? " great" : ""}`}>
       <div className="ring-dial">
         <svg viewBox="0 0 160 160" width="160" height="160" aria-hidden="true">
           <circle cx="80" cy="80" r={RADIUS} className="ring-track" />
@@ -28,7 +30,7 @@ export default function ScoreRing({ value, label, note }) {
             transform="rotate(-90 80 80)"
           />
         </svg>
-        <span className="ring-num">{target}</span>
+        <span className="ring-num">{counted}</span>
       </div>
       <figcaption>
         <strong>{label}</strong>

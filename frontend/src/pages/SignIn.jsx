@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { login, register } from "../api.js";
 import "./SignIn.css";
 
@@ -8,7 +8,9 @@ export default function SignIn() {
   const [mode, setMode] = useState("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [show, setShow] = useState(false);
   const [error, setError] = useState("");
+  const [problem, setProblem] = useState("");
   const [busy, setBusy] = useState(false);
 
   const isRegister = mode === "register";
@@ -20,9 +22,11 @@ export default function SignIn() {
     try {
       if (isRegister) await register(email.trim(), password);
       else await login(email.trim(), password);
-      navigate("/resume", { replace: true });
+      navigate("/dashboard", { replace: true });
     } catch (err) {
+      // the server says exactly what is wrong: no such account, wrong password, or the account already exists
       setError(err.message || "Something went wrong. Please try again.");
+      setProblem(err.status === 409 ? "exists" : err.status === 401 && /no account/i.test(err.message || "") ? "missing" : err.status === 401 ? "password" : "");
     } finally {
       setBusy(false);
     }
@@ -31,10 +35,16 @@ export default function SignIn() {
   function switchMode() {
     setMode(isRegister ? "signin" : "register");
     setError("");
+    setProblem("");
   }
 
   return (
     <main className="auth">
+      <div className="auth-art" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
 
       <section className="auth-card">
         <img className="auth-logo" src="/brand/rolivo-mark.svg" alt="Rolivo" width="84" />
@@ -61,7 +71,7 @@ export default function SignIn() {
           <label>
             Password
             <input
-              type="password"
+              type={show ? "text" : "password"}
               autoComplete={isRegister ? "new-password" : "current-password"}
               required
               minLength={isRegister ? 8 : undefined}
@@ -70,10 +80,45 @@ export default function SignIn() {
               placeholder={isRegister ? "At least 8 characters" : "Your password"}
             />
           </label>
+          <div className="auth-row">
+            <label className="auth-check">
+              <input type="checkbox" checked={show} onChange={(e) => setShow(e.target.checked)} />
+              <span>Show password</span>
+            </label>
+            {!isRegister && (
+              <Link to={`/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ""}`} className="link">
+                Forgot password?
+              </Link>
+            )}
+          </div>
 
           {error && (
             <p className="auth-error" role="alert">
               {error}
+              {problem === "exists" && (
+                <>
+                  {" "}
+                  <button type="button" className="link" onClick={switchMode}>
+                    Sign in instead
+                  </button>
+                </>
+              )}
+              {problem === "missing" && (
+                <>
+                  {" "}
+                  <button type="button" className="link" onClick={switchMode}>
+                    Create an account
+                  </button>
+                </>
+              )}
+              {problem === "password" && (
+                <>
+                  {" "}
+                  <Link to={`/forgot-password?email=${encodeURIComponent(email)}`} className="link">
+                    Reset it
+                  </Link>
+                </>
+              )}
             </p>
           )}
 
