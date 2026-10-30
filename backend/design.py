@@ -1,4 +1,5 @@
 import io
+import re
 
 from typing import Optional
 
@@ -11,6 +12,7 @@ from db import User
 from llm import ask_json
 from parsing import text_from_upload
 from ratelimit import ai_limit
+from page_fit import fit_to_pages
 from resume_layout import detect_layout
 from resume_refine import refine
 from resume_render import (
@@ -43,6 +45,8 @@ class RefineBody(BaseModel):
     instruction: str
     job_text: str = ""
     facts: str = ""
+    template: str = "centered_rules"
+    spec: Optional[dict] = None  # the layout and style on screen, so "one page" is measured on the real file
 
 
 @router.get("/render/templates")
@@ -92,4 +96,8 @@ def refine_resume(body: RefineBody, user: User = Depends(current_user)):
     instruction = body.instruction.strip()[:800]
     if len(instruction) < 3:
         raise HTTPException(status_code=400, detail="Tell Rolivo what you would like changed.")
+    if re.search(r"\b(?:one|1|single)[\s-]*page", instruction, re.I):
+        # measured on the real PDF; an AI cannot see how long a page is
+        fitted, style, notes, ok = fit_to_pages(body.resume, resolve_spec(body.template, body.spec), body.job_text)
+        return {"resume": fitted, "applied": fitted != body.resume or bool(style), "notes": notes, "style": style}
     return refine(body.resume, instruction, body.job_text, body.facts.strip()[:1500], ask_json)

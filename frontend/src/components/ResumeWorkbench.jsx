@@ -319,10 +319,17 @@ export default function ResumeWorkbench({
     if (text.length < 3) return;
     setRf({ state: "busy", notes: [], applied: false });
     try {
-      const out = await api("/refine", { method: "POST", body: { resume, instruction: text, job_text: jobText, facts } });
+      // the layout on screen goes along, so a request like "one page" is measured on the real file
+      const style = styleForExport();
+      const la =
+        current.id === "yours"
+          ? { template: "plain_ats", spec: { ...layout, id: "yours", ...(style || {}) } }
+          : { template: current.id, spec: style };
+      const out = await api("/refine", { method: "POST", body: { resume, instruction: text, job_text: jobText, facts, template: la.template, spec: la.spec } });
       if (out.applied) {
         setHistory((h) => [...h, resume]);
         setResume(out.resume);
+        if (out.style && Object.keys(out.style).length > 0) setTweaks((t) => ({ ...t, ...out.style }));
         setFlash((f) => f + 1);
         setPrompt("");
         touched();
