@@ -12,6 +12,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from db import Analysis, Job, Resume, User, get_db
+from mailer import mail_mode
 
 load_dotenv()
 
@@ -55,6 +56,10 @@ def current_user(
 
 @router.post("/register")
 def register(body: Credentials, db: Session = Depends(get_db)):
+    # With real email set up, new accounts must come through /auth/signup/request + /auth/signup/verify,
+    # so every address is confirmed. With no email set up (tests, a bare local copy) this stays open.
+    if mail_mode() != "console":
+        raise HTTPException(status_code=403, detail="Sign up needs an email confirmation code. Please use the sign-up page.")
     email = body.email.strip().lower()
     if len(email) > 254 or "@" not in email or "." not in email.split("@")[-1]:
         raise HTTPException(status_code=400, detail="Enter a valid email address.")
