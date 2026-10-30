@@ -1,8 +1,12 @@
 import hashlib
 import hmac
+import json
 import os
 import secrets
 import time
+import urllib.error
+import urllib.parse
+import urllib.request
 from datetime import datetime, timedelta, timezone
 from html import escape
 
@@ -12,7 +16,7 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from auth import ALGORITHM, SECRET_KEY, current_user, ph
+from auth import ALGORITHM, SECRET_KEY, current_user, make_token, ph
 from db import User, get_db
 from mailer import MailError, send_email
 
@@ -310,3 +314,141 @@ def email_confirm(body: EmailConfirm, user: User = Depends(current_user), db: Se
     user.email = new
     db.commit()
     return {"ok": True, "email": new, "message": "Your email was changed."}
+
+
+# ---- sign up with a verified email, and "Continue with Google" -------------------------
+# Sign up: the person gives an email and password, we email a 6-digit code, and the account is
+# created only after the right code comes back. The signed ticket holds a hash of the code and the
+# email, never the password, so nothing needs to be stored.
+class SignupRequest(BaseModel):
+    email: str
+    password: str
+
+
+class SignupVerify(BaseModel):
+    ticket: str
+    code: str
+    password: str
+
+
+class GoogleBody(BaseModel):
+    credential: str
+
+
+def _check_new_account(email, password, db):
+    if len(email) > 254 or "@" not in email or "." not in email.split("@")[-1]:
+        raise HTTPException(status_code=400, detail="Enter a valid email address.")
+    if len(password) < 8:
+        raise HTTPException(status_code=400, detail="Use a password with at least 8 characters.")
+    if len(password) > 128:
+        raise HTTPException(status_code=400, detail="That password is too long.")
+    if db.scalar(select(User).where(User.email == email)):
+        raise HTTPException(
+            status_code=409,
+            detail="An account with this email already exists. Sign in instead, or reset your password if you forgot it.",
+        )
+
+
+def _signup_hash(email, code):
+    return hmac.new(SECRET_KEY.encode(), f"signup:{email}:{code}".encode(), hashlib.sha256).hexdigest()
+
+
+@router.post("/signup/request")
+def signup_request(body: SignupRequest, db: Session = Depends(get_db)):
+    email = body.email.strip().lower()
+    _check_new_account(email, body.password, db)
+    key = "signup:" + email
+    _throttle(key)
+    code = f"{secrets.randbelow(10**6):06d}"
+    exp = datetime.now(timezone.utc) + timedelta(minutes=OTP_MINUTES)
+    ticket = jwt.encode({"purpose": "signup", "email": email, "h": _signup_hash(email, code), "exp": exp}, SECRET_KEY, algorithm=ALGORITHM)
+    subject = f"{code} confirms your Rolivo email"
+    text = (
+        f"Hi,\n\nWelcome to Rolivo. Your confirmation code is:\n\n{code}\n\n"
+        f"It works for {OTP_MINUTES} minutes. If you did not sign up, ignore this email and nothing will be created.\n\n- Rolivo"
+    )
+    html = (
+        "<p>Hi,</p><p>Welcome to Rolivo. Your confirmation code is:</p>"
+        f'<p style="font-size:32px;letter-spacing:8px;font-weight:700;margin:16px 0">{code}</p>'
+        f"<p>It works for {OTP_MINUTES} minutes. If you did not sign up, ignore this email and nothing will be created.</p><p>- Rolivo</p>"
+    )
+    try:
+        mode = send_email(email, subject, text, html)
+    except MailError as err:
+        print("Email failed:", err)
+        _refund(key)
+        raise HTTPException(status_code=502, detail="The email could not be sent right now. Try again in a minute.")
+    if mode == "console":
+        return {"ticket": ticket, "message": "Email is not set up on this server yet, so the code was printed in the backend window instead."}
+    return {"ticket": ticket, "message": f"We sent a 6-digit code to {email}. It works for {OTP_MINUTES} minutes."}
+
+
+@router.post("/signup/verify")
+def signup_verify(body: SignupVerify, db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(body.ticket, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("purpose") != "signup":
+            raise ValueError("wrong kind of ticket")
+        email = str(payload["email"])
+    except Exception:
+        raise HTTPException(status_code=400, detail="This code has expired. Go back and ask for a new one.")
+    _check_new_account(email, body.password, db)
+    now = time.time()
+    key = "signup:" + email
+    count, first = _tries.get(key, [0, now])
+    if now - first > 15 * 60:
+        count, first = 0, now
+    if count >= MAX_TRIES:
+        raise HTTPException(status_code=429, detail="Too many wrong codes. Wait 15 minutes, then ask for a new code.")
+    code = "".join(ch for ch in body.code if ch.isdigit())
+    if not hmac.compare_digest(_signup_hash(email, code), str(payload.get("h"))):
+        _tries[key] = [count + 1, first]
+        left = MAX_TRIES - count - 1
+        raise HTTPException(status_code=400, detail=f"That code is not right. {left} {'try' if left == 1 else 'tries'} left." if left > 0 else "That code is not right. Ask for a new code in 15 minutes.")
+    _tries.pop(key, None)
+    user = User(email=email, password_hash=ph.hash(body.password))
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return {"token": make_token(user.id), "email": user.email}
+
+
+@router.get("/google/config")
+def google_config():
+    # the Google client id is public (it is in every "Continue with Google" button); no secret here
+    return {"client_id": os.getenv("GOOGLE_CLIENT_ID", "").strip()}
+
+
+@router.post("/google")
+def google_sign_in(body: GoogleBody, db: Session = Depends(get_db)):
+    client_id = os.getenv("GOOGLE_CLIENT_ID", "").strip()
+    if not client_id:
+        raise HTTPException(status_code=503, detail="Google sign-in is not set up on this server yet.")
+    credential = body.credential.strip()
+    if not credential or len(credential) > 4096:
+        raise HTTPException(status_code=400, detail="Google sign-in failed. Please try again.")
+    url = "https://oauth2.googleapis.com/tokeninfo?" + urllib.parse.urlencode({"id_token": credential})
+    try:
+        with urllib.request.urlopen(url, timeout=10) as res:
+            info = json.loads(res.read().decode())
+    except urllib.error.HTTPError:
+        raise HTTPException(status_code=401, detail="Google could not confirm this sign-in. Please try again.")
+    except Exception:
+        raise HTTPException(status_code=502, detail="Could not reach Google right now. Try again in a minute.")
+    email = str(info.get("email") or "").strip().lower()
+    good = (
+        info.get("aud") == client_id
+        and info.get("iss") in ("accounts.google.com", "https://accounts.google.com")
+        and str(info.get("email_verified")).lower() == "true"
+        and "@" in email
+    )
+    if not good:
+        raise HTTPException(status_code=401, detail="Google could not confirm this sign-in. Please try again.")
+    user = db.scalar(select(User).where(User.email == email))
+    if user is None:
+        # a Google-only account gets a random password nobody knows; "Forgot password" can set a real one later
+        user = User(email=email, password_hash=ph.hash(secrets.token_urlsafe(32)))
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    return {"token": make_token(user.id), "email": user.email}

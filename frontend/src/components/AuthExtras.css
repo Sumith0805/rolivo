@@ -1,0 +1,23 @@
+.g-wrap {
+  margin-top: 4px;
+}
+.g-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.85rem;
+}
+.g-or::before,
+.g-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.g-box {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
