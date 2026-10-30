@@ -76,6 +76,13 @@ def _throttle(email):
     _recent[email] = hits
 
 
+def _refund(email):
+    """A send that failed does not count against the person's limit."""
+    hits = _recent.get(email) or []
+    if hits:
+        hits.pop()
+
+
 def _send_link(user, request, reason):
     link = f"{_base_url(request)}/reset-password?token={_make_reset_token(user)}"
     subject = "Set a new Rolivo password"
@@ -95,6 +102,7 @@ def _send_link(user, request, reason):
         mode = send_email(user.email, subject, text, html)
     except MailError as err:
         print("Email failed:", err)
+        _refund(user.email)
         raise HTTPException(status_code=502, detail="The email could not be sent right now. Try again in a minute.")
     if mode == "console":
         return {"sent": False, "message": "Email is not set up on this server yet, so the link was printed in the backend window instead."}
@@ -154,6 +162,7 @@ def _send_code(user, reason):
         mode = send_email(user.email, subject, text, html)
     except MailError as err:
         print("Email failed:", err)
+        _refund(user.email)
         raise HTTPException(status_code=502, detail="The email could not be sent right now. Try again in a minute.")
     if mode == "console":
         return {"ticket": ticket, "sent": False, "message": "Email is not set up on this server yet, so the code was printed in the backend window instead."}
@@ -268,6 +277,7 @@ def email_request(body: NewEmail, user: User = Depends(current_user), db: Sessio
         mode = send_email(new, f"{code} confirms your new Rolivo email", text, html)
     except MailError as err:
         print("Email failed:", err)
+        _refund(user.email)
         raise HTTPException(status_code=502, detail="The email could not be sent right now. Try again in a minute.")
     if mode == "console":
         return {"ticket": ticket, "message": "Email is not set up on this server yet, so the code was printed in the backend window instead."}
